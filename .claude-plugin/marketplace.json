@@ -1,0 +1,18 @@
+{
+  "name": "dead-code-removal",
+  "owner": {
+    "name": "connie",
+    "url": "https://github.com/ConnieHan2019"
+  },
+  "metadata": {
+    "description": "A disciplined, verifiable workflow for removing dead code from a codebase.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "dead-code-removal",
+      "source": "./plugins/dead-code-removal",
+      "description": "Remove dead code, deprecated handlers, unused modules and orphan symbols safely. Enforces a 3-role workflow (supervisor / executor / blind-reviewer), manifest-based review gates, layered build validation, and acceptance criteria so a removal is correct AND complete in one pass."
+    }
+  ]
+}
