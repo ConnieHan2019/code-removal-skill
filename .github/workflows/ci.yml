@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check shell script syntax
+        run: |
+          set -e
+          found=0
+          while IFS= read -r f; do
+            echo "bash -n $f"
+            bash -n "$f"
+            found=1
+          done < <(find . -name '*.sh' -not -path './.git/*')
+          if [ "$found" -eq 0 ]; then echo "no .sh files found"; exit 1; fi
+
+      - name: Validate plugin manifests are well-formed JSON
+        run: |
+          set -e
+          for f in .claude-plugin/marketplace.json plugins/dead-code-removal/.claude-plugin/plugin.json; do
+            echo "validating $f"
+            python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$f"
+          done
+
+      - name: Guard against leaked internal identifiers
+        run: |
+          set -e
+          pattern='degate|order-book-|optimism-scanner|arbitrum-scanner|dg-notifier|dg-mining|degate-dev|/Users/[a-z]'
+          if grep -rniE "$pattern" . --exclude-dir=.git --exclude-dir=.github; then
+            echo "::error::Found a token that looks like a leaked internal identifier (see matches above)."
+            exit 1
+          fi
+          echo "no internal identifiers found"
